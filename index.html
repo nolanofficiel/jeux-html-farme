@@ -1,0 +1,1504 @@
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Jeu de Ferme Avancé</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            text-align: center;
+            background: linear-gradient(#a8e063, #56ab2f);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        h1 {
+            color: #4a3500;
+            text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.5);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .game-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .stats {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px auto;
+            width: 350px;
+            border: 3px solid #8d5700;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .stats p {
+            margin: 8px 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .field {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* 4 colonnes */
+            grid-template-rows: repeat(4, 1fr); /* 4 lignes */
+            gap: 15px;
+            margin: 25px auto;
+            max-width: 650px;
+            padding: 20px;
+            background-color: rgba(121, 85, 72, 0.3);
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .plot {
+            height: 100px;
+            background-color: #8B4513;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            box-shadow: inset 0 -5px 10px rgba(0,0,0,0.3);
+            border: 2px solid #5d2c0d;
+        }
+        
+        .plot:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .plant {
+            width: 80%;
+            height: 80%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: bottom center;
+            transition: all 0.5s;
+            position: absolute;
+            bottom: 0;
+        }
+        
+        .tabs {
+            display: flex;
+            justify-content: center;
+            margin: 20px auto;
+            gap: 10px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background-color: rgba(255, 255, 255, 0.6);
+            border: 2px solid #8d5700;
+            border-radius: 10px 10px 0 0;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .tab:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .tab.active {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-bottom: none;
+            padding-bottom: 12px;
+        }
+        
+        .tab-content {
+            display: none;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 0 10px 10px 10px;
+            border: 2px solid #8d5700;
+            margin-bottom: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .shop {
+            display: flex;
+            justify-content: center;
+            margin: 20px auto;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .seed-btn, .transform-btn {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 140px;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        .seed-btn:hover, .transform-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        
+        .seed-btn:disabled, .transform-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .seed-icon, .transform-icon {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .carrot-btn {
+            background-color: #FFA500;
+            color: white;
+        }
+        
+        .tomato-btn {
+            background-color: #FF6347;
+            color: white;
+        }
+        
+        .wheat-btn {
+            background-color: #FFD700;
+            color: #333;
+        }
+        
+        .carrot-juice-btn {
+            background-color: #FF8C00;
+            color: white;
+        }
+        
+        .tomato-sauce-btn {
+            background-color: #B22222;
+            color: white;
+        }
+        
+        .bread-btn {
+            background-color: #CD853F;
+            color: white;
+        }
+        
+        .rain-btn {
+            background-color: #4169E1;
+            color: white;
+        }
+        
+        .fertilizer-btn {
+            background-color: #556B2F;
+            color: white;
+        }
+        
+        /* Plantes */
+        .carrot-plant.growth-0 {
+            background-image: linear-gradient(transparent, transparent), radial-gradient(circle at center, #8B4513 5px, transparent 5px);
+            height: 10%;
+        }
+        
+        .carrot-plant.growth-1 {
+            background-image: linear-gradient(transparent 70%, #8B4513 70%), 
+                            radial-gradient(ellipse at top, #00AA00 15px, transparent 15px);
+            height: 30%;
+        }
+        
+        .carrot-plant.growth-2 {
+            background-image: linear-gradient(transparent 70%, #FF6B35 70%), 
+                            radial-gradient(ellipse at top, #00AA00 20px, transparent 20px);
+            height: 50%;
+        }
+        
+        .carrot-plant.growth-3 {
+            background-image: linear-gradient(transparent 60%, #FF6B35 60%), 
+                            radial-gradient(ellipse at top, #00CC00 25px, transparent 25px);
+            height: 70%;
+        }
+        
+        .carrot-plant.growth-4 {
+            background-image: linear-gradient(transparent 50%, #FF6B35 50%), 
+                            radial-gradient(ellipse at top, #00FF00 30px, transparent 30px);
+            height: 90%;
+        }
+        
+        .tomato-plant.growth-0 {
+            background-image: linear-gradient(transparent, transparent), radial-gradient(circle at center, #8B4513 5px, transparent 5px);
+            height: 10%;
+        }
+        
+        .tomato-plant.growth-1 {
+            background-image: linear-gradient(#00AA00, #00AA00);
+            height: 30%;
+            width: 5px;
+        }
+        
+        .tomato-plant.growth-2 {
+            background-image: linear-gradient(#00AA00, #00AA00);
+            height: 50%;
+            width: 8px;
+        }
+        
+        .tomato-plant.growth-3 {
+            background-image: 
+                radial-gradient(circle at right 30% top 20%, #FF0000 10px, transparent 10px),
+                radial-gradient(circle at left 30% top 30%, #FF0000 8px, transparent 8px),
+                linear-gradient(#00AA00, #00AA00);
+            height: 70%;
+            width: 10px;
+        }
+        
+        .tomato-plant.growth-4 {
+            background-image: 
+                radial-gradient(circle at right 40% top 15%, #FF0000 18px, #B22222 19px),
+                radial-gradient(circle at left 40% top 20%, #FF0000 18px, #B22222 19px),
+                radial-gradient(circle at center top 35%, #FF0000 20px, #B22222 21px),
+                linear-gradient(#008000, #008000);
+            height: 100%;
+            width: 25px;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.2));
+        }
+        
+        .wheat-plant.growth-0 {
+            background-image: linear-gradient(transparent, transparent), radial-gradient(circle at center, #8B4513 5px, transparent 5px);
+            height: 10%;
+        }
+        
+        .wheat-plant.growth-1 {
+            background-image: linear-gradient(#90EE90, #90EE90);
+            height: 30%;
+            width: 4px;
+        }
+        
+        .wheat-plant.growth-2 {
+            background-image: linear-gradient(#ADFF2F, #ADFF2F);
+            height: 50%;
+            width: 6px;
+        }
+        
+        .wheat-plant.growth-3 {
+            background-image: 
+                linear-gradient(45deg, transparent 45%, #FFD700 45%, #FFD700 55%, transparent 55%),
+                linear-gradient(-45deg, transparent 45%, #FFD700 45%, #FFD700 55%, transparent 55%),
+                linear-gradient(#ADFF2F, #ADFF2F);
+            background-size: 20px 20px, 20px 20px, auto;
+            background-repeat: space no-repeat, space no-repeat, no-repeat;
+            background-position: center top, center top, center;
+            height: 70%;
+            width: 8px;
+        }
+        
+        .wheat-plant.growth-4 {
+            background-image: 
+                linear-gradient(45deg, transparent 40%, #FFD700 40%, #FFD700 60%, transparent 60%),
+                linear-gradient(-45deg, transparent 40%, #FFD700 40%, #FFD700 60%, transparent 60%),
+                linear-gradient(45deg, transparent 40%, #FFD700 40%, #FFD700 60%, transparent 60%),
+                linear-gradient(-45deg, transparent 40%, #FFD700 40%, #FFD700 60%, transparent 60%),
+                linear-gradient(#ADFF2F, #ADFF2F);
+            background-size: 20px 20px, 20px 20px, 20px 20px, 20px 20px, auto;
+            background-repeat: space no-repeat, space no-repeat, space no-repeat, space no-repeat, no-repeat;
+            background-position: center top, center top, center top 25px, center top 25px, center;
+            height: 90%;
+            width: 10px;
+        }
+        
+        .inventory-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+        
+        .inventory-item:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .inventory-item-icon {
+            width: 30px;
+            height: 30px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-right: 10px;
+        }
+        
+        .inventory-item-name {
+            flex-grow: 1;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        .inventory-item-quantity {
+            font-weight: bold;
+            color: #006400;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 10;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(#f4f4f4, #e5e5e5);
+            padding: 25px;
+            border-radius: 15px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border: 3px solid #8d5700;
+            animation: popIn 0.3s;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .modal h2 {
+            color: #4a3500;
+            margin-top: 0;
+        }
+        
+        .modal-btn {
+            padding: 10px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: all 0.3s;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+        }
+        
+        .modal-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 10px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: #4CAF50;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 15px auto;
+            max-width: 650px;
+            text-align: left;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .instructions ul {
+            padding-left: 25px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        .current-money {
+            font-size: 24px;
+            color: #006400;
+        }
+        
+        .game-title {
+            font-size: 3em;
+            color: #4a3500;
+            text-shadow: 3px 3px 5px rgba(0,0,0,0.2);
+            margin-top: 10px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #FFD700;
+            color: #333;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        .store-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+        
+        .store-item:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .store-item-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .store-item-icon {
+            width: 40px;
+            height: 40px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            margin-right: 10px;
+        }
+        
+        .store-item-name {
+            font-weight: bold;
+        }
+        
+        .store-item-price {
+            color: #006400;
+            font-weight: bold;
+        }
+        
+        .btn-buy {
+            padding: 5px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-buy:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+        
+        .btn-buy:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            display: none;
+        }
+        
+        .raindrop {
+            position: absolute;
+            width: 2px;
+            height: 15px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 0 0 5px 5px;
+            animation: rain-animation linear infinite;
+        }
+        
+        @keyframes rain-animation {
+            0% {
+                transform: translateY(-100vh);
+            }
+            100% {
+                transform: translateY(100vh);
+            }
+        }
+        
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+        
+        .achievement-badge {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            border: 3px solid #8d5700;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+            opacity: 0.5;
+            position: relative;
+        }
+        
+        .achievement-badge.unlocked {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .achievement-badge:hover {
+            transform: scale(1.1);
+        }
+        
+        .achievement-badge.unlocked:hover {
+            transform: scale(1.2);
+        }
+        
+        .achievement-tooltip {
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px;
+            border-radius: 5px;
+            width: 150px;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            z-index: 100;
+        }
+        
+        .achievement-badge:hover .achievement-tooltip {
+            display: block;
+        }
+        
+        .animation-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .transform-animation {
+            position: absolute;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 5px #000;
+            opacity: 0;
+            animation: transformAnimation 2s ease-out;
+        }
+        
+        @keyframes transformAnimation {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="game-title">🌱 Petite Ferme Déluxe 🌱</h1>
+        
+        <div class="stats">
+            <p>Argent: <span id="money" class="current-money">100</span> €</p>
+            <p>Niveau: <span id="level">1</span> <span id="levelBadge" class="badge">Débutant</span></p>
+            <div class="progress-bar">
+                <div class="progress" id="xpProgress"></div>
+            </div>
+            <p>XP: <span id="xp">0</span>/<span id="xpNeeded">100</span></p>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="shop">Magasin</div>
+            <div class="tab" data-tab="inventory">Inventaire</div>
+            <div class="tab" data-tab="workshop">Atelier</div>
+            <div class="tab" data-tab="achievements">Succès</div>
+        </div>
+        
+        <div id="shop" class="tab-content active">
+            <h3>Achetez des graines et des outils</h3>
+            <div class="shop">
+                <button id="buyCarrotBtn" class="seed-btn carrot-btn">
+                    <div class="seed-icon"></div>
+                    Carotte<br>(10€)
+                </button>
+                <button id="buyTomatoBtn" class="seed-btn tomato-btn">
+                    <div class="seed-icon"></div>
+                    Tomate<br>(20€)
+                </button>
+                <button id="buyWheatBtn" class="seed-btn wheat-btn">
+                    <div class="seed-icon"></div>
+                    Blé<br>(15€)
+                </button>
+                <button id="rainBtn" class="seed-btn rain-btn">
+                    <div class="seed-icon"></div>
+                    Arroser<br>(5€)
+                </button>
+                <button id="fertilizerBtn" class="seed-btn fertilizer-btn">
+                    <div class="seed-icon"></div>
+                    Engrais<br>(30€)
+                </button>
+            </div>
+        </div>
+        
+        <div id="inventory" class="tab-content">
+            <h3>Votre inventaire</h3>
+            <div id="inventoryItems">
+                <!-- Rempli par JavaScript -->
+            </div>
+        </div>
+        
+        <div id="workshop" class="tab-content">
+            <h3>Transformez vos récoltes</h3>
+            <div class="shop">
+                <button id="makeCarrotJuiceBtn" class="transform-btn carrot-juice-btn" disabled>
+                    <div class="transform-icon"></div>
+                    Jus de carotte<br>(3 carottes)
+                </button>
+                <button id="makeTomatoSauceBtn" class="transform-btn tomato-sauce-btn" disabled>
+                    <div class="transform-icon"></div>
+                    Sauce tomate<br>(4 tomates)
+                </button>
+                <button id="makeBreadBtn" class="transform-btn bread-btn" disabled>
+                    <div class="transform-icon"></div>
+                    Pain<br>(2 blés)
+                </button>
+            </div>
+            <div class="instructions">
+                <p>Transformez vos récoltes en produits de valeur supérieure:</p>
+                <ul>
+                    <li>Jus de carotte: 3 carottes → 1 jus (valeur: 100€)</li>
+                    <li>Sauce tomate: 4 tomates → 1 sauce (valeur: 200€)</li>
+                    <li>Pain: 2 blés → 1 pain (valeur: 90€)</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div id="achievements" class="tab-content">
+            <h3>Vos succès</h3>
+            <div class="badge-container">
+                <div class="achievement-badge" id="harvest10" data-achievement="harvest10">
+                    🌽
+                    <div class="achievement-tooltip">Récolteur: Récoltez 10 plantes</div>
+                </div>
+                <div class="achievement-badge" id="earn1000" data-achievement="earn1000">
+                    💰
+                    <div class="achievement-tooltip">Riche fermier: Gagnez 1000€</div>
+                </div>
+                <div class="achievement-badge" id="level5" data-achievement="level5">
+                    🏆
+                    <div class="achievement-tooltip">Fermier d'élite: Atteignez le niveau 5</div>
+                </div>
+                <div class="achievement-badge" id="transform5" data-achievement="transform5">
+                    🧪
+                    <div class="achievement-tooltip">Alchimiste: Transformez 5 produits</div>
+                </div>
+                <div class="achievement-badge" id="fullField" data-achievement="fullField">
+                    🌾
+                    <div class="achievement-tooltip">Champ complet: Plantez toutes les parcelles</div>
+                </div>
+                <div class="achievement-badge" id="allTypes" data-achievement="allTypes">
+                    🥕
+                    <div class="achievement-tooltip">Diversifié: Récoltez tous les types de plantes</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="field" id="field">
+            <!-- Plots will be generated by JS -->
+        </div>
+        
+        <div class="instructions">
+            <h3>Comment jouer :</h3>
+            <ul>
+                <li>Achetez des graines dans le magasin et plantez-les sur vos parcelles</li>
+                <li>Attendez que les plantes poussent (carotte: 5s, tomate: 8s, blé: 6s)</li>
+                <li>Récoltez les plantes mûres en cliquant dessus</li>
+                <li>Utilisez "Arroser" pour accélérer la croissance de toutes les plantes</li>
+                <li>Transformez vos récoltes en produits de valeur supérieure dans l'atelier</li>
+                <li>Vendez vos produits pour gagner de l'argent et de l'expérience</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="modal" id="harvestModal">
+        <div class="modal-content">
+            <h2>🎉 Récolte! 🎉</h2>
+            <p id="harvestMessage"></p>
+            <button id="closeModalBtn" class="modal-btn">Super!</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="levelUpModal">
+        <div class="modal-content">
+            <h2>🎖️ Niveau Supérieur! 🎖️</h2>
+            <p id="levelUpMessage"></p>
+            <button id="closeLevelUpBtn" class="modal-btn">Continuer</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="transformModal">
+        <div class="modal-content">
+            <h2>🧪 Transformation! 🧪</h2>
+            <p id="transformMessage"></p>
+            <button id="closeTransformBtn" class="modal-btn">Génial!</button>
+        </div>
+    </div>
+    
+    <div class="modal" id="achievementModal">
+        <div class="modal-content">
+            <h2>🏆 Succès débloqué! 🏆</h2>
+            <p id="achievementMessage"></p>
+            <button id="closeAchievementBtn" class="modal-btn">Continuer</button>
+        </div>
+    </div>
+    
+    <div class="rain" id="rainContainer"></div>
+    <div class="animation-container" id="animationContainer"></div>
+    
+    <script>
+        // Variables du jeu
+    let money = 100;
+    let level = 1;
+    let xp = 0;
+    let xpNeeded = 100;
+    let growthSpeedMultiplier = 1;
+    let totalHarvested = 0;
+    let maxMoneyEarned = 100;
+    let transformations = 0;
+    let harvestedTypes = new Set();
+
+    // Inventaire
+    let inventory = {
+        carrot: 0,
+        tomato: 0,
+        wheat: 0,
+        carrotJuice: 0,
+        tomatoSauce: 0,
+        bread: 0
+    };
+
+    // Types de plantes
+    const plants = {
+        carrot: {
+            name: "Carotte",
+            price: 10,
+            sellPrice: 25,
+            growthTime: 5,
+            xpGain: 10
+        },
+        tomato: {
+            name: "Tomate",
+            price: 20,
+            sellPrice: 45,
+            growthTime: 8,
+            xpGain: 20
+        },
+        wheat: {
+            name: "Blé",
+            price: 15,
+            sellPrice: 35,
+            growthTime: 6,
+            xpGain: 15
+        }
+    };
+
+    // Produits transformés
+    const products = {
+        carrotJuice: {
+            name: "Jus de carotte",
+            sellPrice: 100,
+            xpGain: 30,
+            ingredients: { carrot: 3 }
+        },
+        tomatoSauce: {
+            name: "Sauce tomate",
+            sellPrice: 200,
+            xpGain: 50,
+            ingredients: { tomato: 4 }
+        },
+        bread: {
+            name: "Pain",
+            sellPrice: 90,
+            xpGain: 25,
+            ingredients: { wheat: 2 }
+        }
+    };
+
+    // Succès
+    const achievements = {
+        harvest10: {
+            name: "Récolteur",
+            description: "Récoltez 10 plantes",
+            unlocked: false,
+            check: () => totalHarvested >= 10
+        },
+        earn1000: {
+            name: "Riche fermier",
+            description: "Gagnez 1000€",
+            unlocked: false,
+            check: () => maxMoneyEarned >= 1000
+        },
+        level5: {
+            name: "Fermier d'élite",
+            description: "Atteignez le niveau 5",
+            unlocked: false,
+            check: () => level >= 5
+        },
+        transform5: {
+            name: "Alchimiste",
+            description: "Transformez 5 produits",
+            unlocked: false,
+            check: () => transformations >= 5
+        },
+        fullField: {
+            name: "Champ complet",
+            description: "Plantez toutes les parcelles",
+            unlocked: false,
+            check: () => {
+                const plots = document.querySelectorAll('.plot');
+                return Array.from(plots).every(plot => plot.querySelector('.plant'));
+            }
+        },
+        allTypes: {
+            name: "Diversifié",
+            description: "Récoltez tous les types de plantes",
+            unlocked: false,
+            check: () => harvestedTypes.size >= 3
+        }
+    };
+
+    // Niveaux et badges
+    const levelBadges = {
+        1: "Débutant",
+        2: "Apprenti",
+        3: "Jardinier",
+        4: "Agriculteur",
+        5: "Maître fermier",
+        6: "Expert",
+        7: "Légende",
+        8: "Magnat agricole",
+        9: "Virtuose",
+        10: "Dieu de la ferme"
+    };
+
+    // Initialisation du jeu
+    document.addEventListener('DOMContentLoaded', function() {
+        createField();
+        updateMoney();
+        updateLevel();
+        updateInventory();
+        setupEventListeners();
+        checkAchievements();
+    });
+
+    // Création du champ
+    function createField() {
+        const field = document.getElementById('field');
+        for (let i = 0; i < 16; i++) {
+            const plot = document.createElement('div');
+            plot.className = 'plot';
+            plot.addEventListener('click', handlePlotClick);
+            field.appendChild(plot);
+        }
+    }
+
+    // Gestion des clics sur les parcelles
+    function handlePlotClick(event) {
+        const plot = event.currentTarget;
+        const plant = plot.querySelector('.plant');
+        
+        if (plant) {
+            // S'il y a une plante mature, la récolter
+            if (plant.dataset.growth === '4') {
+                harvestPlant(plot, plant);
+            } else {
+                showNotification(`Cette plante n'est pas encore mûre !`);
+            }
+        } else {
+            // Sinon, ouvrir le modal de plantation
+            openPlantModal(plot);
+        }
+    }
+
+    // Ouvrir le modal de plantation
+    function openPlantModal(plot) {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'flex';
+        
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content';
+        
+        const title = document.createElement('h2');
+        title.textContent = 'Planter une graine';
+        
+        const options = document.createElement('div');
+        options.className = 'shop';
+        
+        for (const [type, plant] of Object.entries(plants)) {
+            const button = document.createElement('button');
+            button.className = `seed-btn ${type}-btn`;
+            button.innerHTML = `
+                <div class="seed-icon"></div>
+                ${plant.name}<br>(${plant.price}€)
+            `;
+            button.disabled = money < plant.price;
+            button.addEventListener('click', () => {
+                if (money >= plant.price) {
+                    plantSeed(plot, type);
+                    modal.remove();
+                }
+            });
+            options.appendChild(button);
+        }
+        
+        const cancelBtn = document.createElement('button');
+        cancelBtn.className = 'modal-btn';
+        cancelBtn.textContent = 'Annuler';
+        cancelBtn.addEventListener('click', () => modal.remove());
+        
+        modalContent.appendChild(title);
+        modalContent.appendChild(options);
+        modalContent.appendChild(cancelBtn);
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+    }
+
+    // Planter une graine
+    function plantSeed(plot, plantType) {
+        if (money >= plants[plantType].price) {
+            money -= plants[plantType].price;
+            updateMoney();
+            
+            const plant = document.createElement('div');
+            plant.className = `plant ${plantType}-plant growth-0`;
+            plant.dataset.type = plantType;
+            plant.dataset.growth = '0';
+            
+            plot.appendChild(plant);
+            
+            // Démarrer la croissance
+            growPlant(plant);
+            
+            // Vérifier les succès
+            checkAchievements();
+        } else {
+            showNotification("Vous n'avez pas assez d'argent !");
+        }
+    }
+
+    // Faire pousser une plante
+    function growPlant(plant) {
+        const plantType = plant.dataset.type;
+        const growthStage = parseInt(plant.dataset.growth);
+        
+        if (growthStage < 4) {
+            const nextStage = growthStage + 1;
+            const growthTime = plants[plantType].growthTime * 1000 / growthSpeedMultiplier;
+            
+            setTimeout(() => {
+                if (plant.parentElement) {  // Vérifier si la plante existe encore
+                    plant.classList.remove(`growth-${growthStage}`);
+                    plant.classList.add(`growth-${nextStage}`);
+                    plant.dataset.growth = nextStage;
+                    
+                    if (nextStage < 4) {
+                        growPlant(plant);
+                    } else {
+                        plant.classList.add('ready');
+                        showNotification(`Une ${plants[plantType].name} est prête à être récoltée !`);
+                    }
+                }
+            }, growthTime);
+        }
+    }
+
+    // Récolter une plante
+    function harvestPlant(plot, plant) {
+        const plantType = plant.dataset.type;
+        inventory[plantType]++;
+        harvestedTypes.add(plantType);
+        totalHarvested++;
+        
+        addXp(plants[plantType].xpGain);
+        
+        // Supprimer la plante
+        plant.remove();
+        
+        // Afficher le modal de récolte
+        const harvestModal = document.getElementById('harvestModal');
+        const harvestMessage = document.getElementById('harvestMessage');
+        harvestMessage.innerHTML = `Vous avez récolté une ${plants[plantType].name} !<br>+${plants[plantType].xpGain} XP`;
+        harvestModal.style.display = 'flex';
+        
+        // Mise à jour de l'inventaire
+        updateInventory();
+        
+        // Vérifier les succès
+        checkAchievements();
+    }
+
+    // Ajouter de l'XP
+    function addXp(amount) {
+        xp += amount;
+        
+        // Vérifier si le niveau augmente
+        if (xp >= xpNeeded) {
+            levelUp();
+        }
+        
+        updateLevel();
+    }
+
+    // Augmenter de niveau
+    function levelUp() {
+        level++;
+        xp -= xpNeeded;
+        xpNeeded = Math.floor(xpNeeded * 1.5);
+        
+        // Afficher le modal de niveau
+        const levelUpModal = document.getElementById('levelUpModal');
+        const levelUpMessage = document.getElementById('levelUpMessage');
+        const badge = levelBadges[level] || "Légende";
+        
+        levelUpMessage.innerHTML = `Félicitations ! Vous êtes passé au niveau ${level} : ${badge}.<br>Vous avez débloqué une nouvelle parcelle !`;
+        levelUpModal.style.display = 'flex';
+        
+        // Ajouter une parcelle supplémentaire (max 12)
+        if (document.querySelectorAll('.plot').length < 12) {
+            const field = document.getElementById('field');
+            const plot = document.createElement('div');
+            plot.className = 'plot';
+            plot.addEventListener('click', handlePlotClick);
+            field.appendChild(plot);
+        }
+        
+        // Vérifier les succès
+        checkAchievements();
+    }
+
+    // Mise à jour de l'affichage de l'argent
+    function updateMoney() {
+        document.getElementById('money').textContent = money;
+        
+        // Mettre à jour le max d'argent gagné
+        if (money > maxMoneyEarned) {
+            maxMoneyEarned = money;
+        }
+        
+        // Mettre à jour les boutons d'achat
+        updateShopButtons();
+    }
+
+    // Mise à jour de l'affichage du niveau
+    function updateLevel() {
+        document.getElementById('level').textContent = level;
+        document.getElementById('levelBadge').textContent = levelBadges[level] || "Légende";
+        document.getElementById('xp').textContent = xp;
+        document.getElementById('xpNeeded').textContent = xpNeeded;
+        
+        // Mettre à jour la barre de progression
+        const progressPercent = (xp / xpNeeded) * 100;
+        document.getElementById('xpProgress').style.width = `${progressPercent}%`;
+    }
+
+    // Mise à jour de l'affichage de l'inventaire
+    function updateInventory() {
+        const inventoryContainer = document.getElementById('inventoryItems');
+        inventoryContainer.innerHTML = '';
+        
+        let hasItems = false;
+        
+        // Ajouter les plantes à l'inventaire
+        for (const [type, plant] of Object.entries(plants)) {
+            if (inventory[type] > 0) {
+                hasItems = true;
+                const item = document.createElement('div');
+                item.className = 'inventory-item';
+                
+                item.innerHTML = `
+                    <div class="inventory-item-icon"></div>
+                    <div class="inventory-item-name">${plant.name}</div>
+                    <div class="inventory-item-quantity">x${inventory[type]}</div>
+                    <button class="btn-buy">Vendre (${plant.sellPrice}€)</button>
+                `;
+                
+                item.querySelector('button').addEventListener('click', () => sellItem(type));
+                inventoryContainer.appendChild(item);
+            }
+        }
+        
+        // Ajouter les produits transformés à l'inventaire
+        for (const [type, product] of Object.entries(products)) {
+            if (inventory[type] > 0) {
+                hasItems = true;
+                const item = document.createElement('div');
+                item.className = 'inventory-item';
+                
+                item.innerHTML = `
+                    <div class="inventory-item-icon"></div>
+                    <div class="inventory-item-name">${product.name}</div>
+                    <div class="inventory-item-quantity">x${inventory[type]}</div>
+                    <button class="btn-buy">Vendre (${product.sellPrice}€)</button>
+                `;
+                
+                item.querySelector('button').addEventListener('click', () => sellItem(type));
+                inventoryContainer.appendChild(item);
+            }
+        }
+        
+        if (!hasItems) {
+            inventoryContainer.innerHTML = '<p>Votre inventaire est vide.</p>';
+        }
+        
+        // Mettre à jour les boutons de transformation
+        updateTransformButtons();
+    }
+
+    // Vendre un item
+    function sellItem(type) {
+        if (inventory[type] > 0) {
+            inventory[type]--;
+            
+            let sellPrice, xpGain;
+            
+            if (plants[type]) {
+                sellPrice = plants[type].sellPrice;
+                xpGain = plants[type].xpGain / 2;
+            } else if (products[type]) {
+                sellPrice = products[type].sellPrice;
+                xpGain = products[type].xpGain;
+            }
+            
+            money += sellPrice;
+            addXp(xpGain);
+            
+            updateMoney();
+            updateInventory();
+            
+            showNotification(`Vous avez vendu un item pour ${sellPrice}€ !`);
+            
+            // Vérifier les succès
+            checkAchievements();
+        }
+    }
+
+    // Mettre à jour les boutons d'achat
+    function updateShopButtons() {
+        document.getElementById('buyCarrotBtn').disabled = money < plants.carrot.price;
+        document.getElementById('buyTomatoBtn').disabled = money < plants.tomato.price;
+        document.getElementById('buyWheatBtn').disabled = money < plants.wheat.price;
+        document.getElementById('rainBtn').disabled = money < 5;
+        document.getElementById('fertilizerBtn').disabled = money < 30;
+    }
+
+    // Mettre à jour les boutons de transformation
+    function updateTransformButtons() {
+        document.getElementById('makeCarrotJuiceBtn').disabled = inventory.carrot < 3;
+        document.getElementById('makeTomatoSauceBtn').disabled = inventory.tomato < 4;
+        document.getElementById('makeBreadBtn').disabled = inventory.wheat < 2;
+    }
+
+    // Transformer des produits
+    function transformProduct(productType) {
+        const product = products[productType];
+        let canTransform = true;
+        
+        // Vérifier si on a les ingrédients
+        for (const [ingredient, amount] of Object.entries(product.ingredients)) {
+            if (inventory[ingredient] < amount) {
+                canTransform = false;
+                break;
+            }
+        }
+        
+        if (canTransform) {
+            // Consommer les ingrédients
+            for (const [ingredient, amount] of Object.entries(product.ingredients)) {
+                inventory[ingredient] -= amount;
+            }
+            
+            // Ajouter le produit transformé
+            inventory[productType]++;
+            transformations++;
+            
+            // Ajouter de l'XP
+            addXp(product.xpGain);
+            
+            // Afficher le modal de transformation
+            const transformModal = document.getElementById('transformModal');
+            const transformMessage = document.getElementById('transformMessage');
+            transformMessage.innerHTML = `Vous avez créé ${product.name} !<br>+${product.xpGain} XP`;
+            transformModal.style.display = 'flex';
+            
+            // Créer une animation de transformation
+            createTransformAnimation(productType);
+            
+            // Mise à jour de l'inventaire
+            updateInventory();
+            
+            // Vérifier les succès
+            checkAchievements();
+        } else {
+            showNotification("Vous n'avez pas assez d'ingrédients !");
+        }
+    }
+
+    // Créer une animation de transformation
+    function createTransformAnimation(productType) {
+        const container = document.getElementById('animationContainer');
+        container.innerHTML = '';
+        container.style.display = 'block';
+        
+        const animation = document.createElement('div');
+        animation.className = 'transform-animation';
+        animation.textContent = `✨ ${products[productType].name} ✨`;
+        
+        // Positionner l'animation au centre
+        animation.style.left = '50%';
+        animation.style.top = '50%';
+        animation.style.transform = 'translate(-50%, -50%)';
+        
+        container.appendChild(animation);
+        
+        setTimeout(() => {
+            container.style.display = 'none';
+        }, 2000);
+    }
+
+    // Arroser les plantes
+    function waterPlants() {
+        if (money >= 5) {
+            money -= 5;
+            updateMoney();
+            
+            // Augmenter temporairement la vitesse de croissance
+            growthSpeedMultiplier = 2;
+            setTimeout(() => {
+                growthSpeedMultiplier = 1;
+            }, 10000);
+            
+            // Afficher l'animation de pluie
+            const rainContainer = document.getElementById('rainContainer');
+            rainContainer.innerHTML = '';
+            rainContainer.style.display = 'block';
+            
+            // Créer les gouttes de pluie
+            for (let i = 0; i < 100; i++) {
+                const raindrop = document.createElement('div');
+                raindrop.className = 'raindrop';
+                raindrop.style.left = `${Math.random() * 100}%`;
+                raindrop.style.animationDuration = `${Math.random() * 0.5 + 0.5}s`;
+                raindrop.style.animationDelay = `${Math.random() * 0.5}s`;
+                rainContainer.appendChild(raindrop);
+            }
+            
+            setTimeout(() => {
+                rainContainer.style.display = 'none';
+            }, 5000);
+            
+            showNotification("Vous avez arrosé toutes vos plantes !");
+        } else {
+            showNotification("Vous n'avez pas assez d'argent !");
+        }
+    }
+
+    // Utiliser de l'engrais
+    function useFertilizer() {
+        if (money >= 30) {
+            money -= 30;
+            updateMoney();
+            
+            // Augmenter fortement la vitesse de croissance
+            growthSpeedMultiplier = 5;
+            setTimeout(() => {
+                growthSpeedMultiplier = 1;
+            }, 10000);
+            
+            // Faire briller toutes les plantes
+            const plants = document.querySelectorAll('.plant');
+            plants.forEach(plant => {
+                plant.style.filter = 'brightness(1.5) saturate(1.5)';
+                setTimeout(() => {
+                    plant.style.filter = '';
+                }, 10000);
+            });
+            
+            showNotification("Vous avez utilisé de l'engrais sur toutes vos plantes !");
+        } else {
+            showNotification("Vous n'avez pas assez d'argent !");
+        }
+    }
+
+    // Acheter des graines (pour planter directement)
+    function buySeeds(type) {
+        const plant = plants[type];
+        
+        if (money >= plant.price) {
+            const emptyPlots = Array.from(document.querySelectorAll('.plot')).filter(plot => !plot.querySelector('.plant'));
+            
+            if (emptyPlots.length > 0) {
+                plantSeed(emptyPlots[0], type);
+                showNotification(`Vous avez planté une graine de ${plant.name} !`);
+            } else {
+                showNotification("Toutes les parcelles sont occupées !");
+            }
+        } else {
+            showNotification("Vous n'avez pas assez d'argent !");
+        }
+    }
+
+    // Vérifier les succès
+    function checkAchievements() {
+        let newAchievements = [];
+        
+        for (const [id, achievement] of Object.entries(achievements)) {
+            if (!achievement.unlocked && achievement.check()) {
+                achievement.unlocked = true;
+                newAchievements.push(achievement);
+                
+                // Mettre à jour l'affichage du badge
+                const badge = document.getElementById(id);
+                badge.classList.add('unlocked');
+            }
+        }
+        
+        // Afficher les nouveaux succès
+        if (newAchievements.length > 0) {
+            const achievementModal = document.getElementById('achievementModal');
+            const achievementMessage = document.getElementById('achievementMessage');
+            
+            achievementMessage.innerHTML = newAchievements.map(a => 
+                `<strong>${a.name}</strong> : ${a.description}`
+            ).join('<br>');
+            
+            achievementModal.style.display = 'flex';
+            
+            // Ajouter de l'XP pour chaque succès
+            newAchievements.forEach(() => addXp(50));
+        }
+    }
+
+    // Afficher une notification
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.position = 'fixed';
+        notification.style.bottom = '20px';
+        notification.style.left = '50%';
+        notification.style.transform = 'translateX(-50%)';
+        notification.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        notification.style.color = 'white';
+        notification.style.padding = '10px 20px';
+        notification.style.borderRadius = '10px';
+        notification.style.zIndex = '1000';
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.remove();
+        }, 3000);
+    }
+
+    // Configuration des écouteurs d'événements
+    function setupEventListeners() {
+        // Onglets
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.dataset.tab;
+                
+                // Désactiver tous les onglets
+                tabs.forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+                
+                // Activer l'onglet sélectionné
+                tab.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Boutons d'achat
+        document.getElementById('buyCarrotBtn').addEventListener('click', () => buySeeds('carrot'));
+        document.getElementById('buyTomatoBtn').addEventListener('click', () => buySeeds('tomato'));
+        document.getElementById('buyWheatBtn').addEventListener('click', () => buySeeds('wheat'));
+        document.getElementById('rainBtn').addEventListener('click', waterPlants);
+        document.getElementById('fertilizerBtn').addEventListener('click', useFertilizer);
+        
+        // Boutons de transformation
+        document.getElementById('makeCarrotJuiceBtn').addEventListener('click', () => transformProduct('carrotJuice'));
+        document.getElementById('makeTomatoSauceBtn').addEventListener('click', () => transformProduct('tomatoSauce'));
+        document.getElementById('makeBreadBtn').addEventListener('click', () => transformProduct('bread'));
+        
+        // Boutons de fermeture de modal
+        document.getElementById('closeModalBtn').addEventListener('click', () => {
+            document.getElementById('harvestModal').style.display = 'none';
+        });
+        
+        document.getElementById('closeLevelUpBtn').addEventListener('click', () => {
+            document.getElementById('levelUpModal').style.display = 'none';
+        });
+        
+        document.getElementById('closeTransformBtn').addEventListener('click', () => {
+            document.getElementById('transformModal').style.display = 'none';
+        });
+        
+        document.getElementById('closeAchievementBtn').addEventListener('click', () => {
+            document.getElementById('achievementModal').style.display = 'none';
+        });
+    }
+</script>
+</body>
+</html>
